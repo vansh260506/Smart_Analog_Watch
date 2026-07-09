@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Smart Analog Watch Pro</title>
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="css/style.css" />
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+</head>
+<body>
+
+    <!-- ===== LOADING OVERLAY ===== -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loader"></div>
+        <p class="loading-text">DETECTING YOUR LOCATION...</p>
+    </div>
+
+    <!-- ===== PERMISSION OVERLAY ===== -->
+    <div id="permissionOverlay" class="permission-overlay">
+        <div class="icon">📍</div>
+        <h2>Location Permission Required</h2>
+        <p>To automatically set your watch to the correct timezone, we need access to your location.</p>
+        <button class="btn btn-primary" onclick="window.retryLocation()">
+            <i class="fas fa-redo"></i> Try Again
+        </button>
+        <br>
+        <button class="btn btn-secondary" onclick="window.useManualTimezone()">
+            <i class="fas fa-clock"></i> Use Manual Timezone
+        </button>
+    </div>
+
+    <!-- ===== MAIN CONTAINER ===== -->
+    <div class="watch-container">
+        <!-- ===== WATCH ===== -->
+        <div class="watch" id="watch">
+            <div class="watch-face" id="watchFace">
+                <div id="markers"></div>
+                
+                <div class="date-window" id="dateWindow">
+                    <span class="day" id="dayName">MON</span>
+                    <span id="dateNumber">15</span>
+                </div>
+                
+                <div class="hand hour-hand" id="hourHand"></div>
+                <div class="hand minute-hand" id="minuteHand"></div>
+                <div class="second-hand" id="secondHand"></div>
+                <div class="center-dot"></div>
+                <div class="glass"></div>
+                <div class="glow-ring"></div>
+                
+                <div class="battery-indicator">
+                    <span class="battery-icon">🔋</span>
+                    <span class="battery-level" id="batteryLevel">--%</span>
+                </div>
+                
+                <div class="world-clock-toggle" id="worldClockToggle" title="Toggle World Clock Mode">
+                    🌍
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== INFO PANEL ===== -->
+        <div class="info-panel" id="infoPanel">
+            <div class="info-item">
+                <span class="label">Time</span>
+                <span class="value" id="timeDisplay">--:--:--</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Timezone</span>
+                <span class="value" id="timezoneDisplay">--</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Location</span>
+                <span class="value location" id="locationDisplay">Detecting...</span>
+            </div>
+            <div class="info-item">
+                <span class="label">UTC Offset</span>
+                <span class="value" id="utcOffset">--</span>
+            </div>
+            <div class="status">
+                <span class="dot searching" id="statusDot"></span>
+                <span id="statusText">Initializing...</span>
+            </div>
+        </div>
+
+        <!-- ===== BUTTONS ===== -->
+        <div class="button-group">
+            <button class="btn btn-primary" id="refreshLocation">
+                <i class="fas fa-sync-alt"></i> Refresh Location
+            </button>
+            <button class="btn btn-secondary" id="toggle24Hour">
+                <i class="fas fa-clock"></i> 24H Format
+            </button>
+            <button class="btn btn-success" id="toggleTheme">
+                <i class="fas fa-moon"></i> Theme
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== JAVASCRIPT MODULES ===== -->
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/watch.js"></script>
+    <script src="js/location.js"></script>
+    <script src="js/themes.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
