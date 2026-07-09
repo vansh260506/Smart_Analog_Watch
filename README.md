@@ -2,7 +2,7 @@
 
 A beautiful, feature-rich analog wrist watch that automatically detects your location and sets the correct timezone.
 
-![Smart Watch Preview](https://via.placeholder.com/800x400/2a2a4a/6C63FF?text=Smart+Analog+Watch)
+
 
 ---
 
@@ -29,12 +29,3 @@ A beautiful, feature-rich analog wrist watch that automatically detects your loc
 
 ---
 
-## 🚀 Live Demo
-
-🔗 **[View Live Demo](https://YOUR_USERNAME.github.io/smart-analog-watch)**
-
-> Replace `YOUR_USERNAME` with your actual GitHub username
-
----
-
-## 📁 Project Structure
