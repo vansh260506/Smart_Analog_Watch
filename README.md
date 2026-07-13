@@ -26,6 +26,7 @@ A beautiful, feature-rich analog wrist watch that automatically detects your loc
 - **Vanilla JavaScript** - ES6+ modules
 - **TimezoneDB API** - Accurate timezone detection
 - **BigDataCloud API** - Reverse geocoding
+<img width="1772" height="1478" alt="image" src="https://github.com/user-attachments/assets/6b647ab1-644e-4307-b21a-f80846f2adef" />
 
 ---
 
