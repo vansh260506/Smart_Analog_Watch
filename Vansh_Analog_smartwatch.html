@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Smart Analog Watch</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0c0c1d 0%, #1a1a3e 50%, #0c0c1d 100%);
+            font-family: 'Orbitron', sans-serif;
+            padding: 20px;
+            overflow: hidden;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.3), transparent);
+            background-size: 200px 200px;
+            animation: stars 20s linear infinite;
+            z-index: 0;
+        }
+        @keyframes stars {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-200px); }
+        }
+        .watch-container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+        .watch {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(ellipse at center, #2a2a4a 0%, #1a1a2e 60%, #0a0a15 100%);
+            box-shadow: 0 0 60px rgba(108, 99, 255, 0.3), 0 0 120px rgba(108, 99, 255, 0.1), inset 0 0 60px rgba(255,255,255,0.05), 0 20px 60px rgba(0,0,0,0.8);
+            border: 4px solid #4a4a6a;
+            transition: all 0.3s ease;
+        }
+        .watch:hover {
+            transform: scale(1.02);
+        }
+        .watch-face {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(ellipse at center, #2a2a4a 0%, #1a1a2e 100%);
+            overflow: hidden;
+        }
+        .marker {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-origin: center;
+            width: 2px;
+            height: 18px;
+            background: #8a8aaa;
+            transform: translate(-50%, -100%) rotate(0deg);
+            border-radius: 1px;
+        }
+        .marker.major {
+            height: 28px;
+            width: 3px;
+            background: #aaaacc;
+        }
+        .number {
+            position: absolute;
+            color: #aaaacc;
+            font-size: 18px;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 10px rgba(108, 99, 255, 0.3);
+            pointer-events: none;
+        }
+        .hand {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            border-radius: 4px;
+        }
+        .hour-hand {
+            width: 6px;
+            height: 90px;
+            background: linear-gradient(to top, #aaaacc, #ffffff);
+            transform: translate(-50%, -100%) rotate(0deg);
+            box-shadow: 0 0 10px rgba(108, 99, 255, 0.3);
+            border-radius: 3px;
+            z-index: 3;
+        }
+        .hour-hand::after {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 12px;
+            background: #aaaacc;
+            border-radius: 50%;
+        }
+        .minute-hand {
+            width: 4px;
+            height: 130px;
+            background: linear-gradient(to top, #ccccee, #ffffff);
+            transform: translate(-50%, -100%) rotate(0deg);
+            box-shadow: 0 0 15px rgba(108, 99, 255, 0.2);
+            border-radius: 2px;
+            z-index: 4;
+        }
+        .second-hand {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 130px;
+            background: linear-gradient(to top, #ff6b6b, #ff4757);
+            transform-origin: bottom center;
+            transform: translate(-50%, -100%) rotate(0deg);
+            box-shadow: 0 0 20px rgba(255, 71, 87, 0.5);
+            border-radius: 1px;
+            z-index: 5;
+            transition: none;
+        }
+        .second-hand::before {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
+            background: #ff4757;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(255, 71, 87, 0.6);
+        }
+        .center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 18px;
+            height: 18px;
+            background: radial-gradient(circle, #ffffff, #aaaacc);
+            border-radius: 50%;
+            z-index: 6;
+            box-shadow: 0 0 20px rgba(108, 99, 255, 0.3);
+            border: 2px solid #4a4a6a;
+        }
+        .date-window {
+            position: absolute;
+            bottom: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(108, 99, 255, 0.3);
+            border-radius: 4px;
+            padding: 4px 12px;
+            color: #ffffff;
+            font-size: 12px;
+            font-family: 'Orbitron', sans-serif;
+            z-index: 2;
+            text-align: center;
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px rgba(108, 99, 255, 0.1);
+        }
+        .date-window .day {
+            font-size: 10px;
+            color: #6a6a8a;
+            margin-right: 4px;
+        }
+        .glass {
+            position: absolute;
+            top: -2%;
+            left: -2%;
+            right: -2%;
+            bottom: -2%;
+            border-radius: 50%;
+            background: radial-gradient(ellipse at 30% 25%, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 40%, transparent 70%);
+            pointer-events: none;
+            z-index: 10;
+        }
+        .glow-ring {
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            right: -8px;
+            bottom: -8px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            z-index: -1;
+            animation: glowPulse 3s ease-in-out infinite;
+        }
+        @keyframes glowPulse {
+            0%, 100% { border-color: rgba(108, 99, 255, 0.1); box-shadow: 0 0 30px rgba(108, 99, 255, 0.05); }
+            50% { border-color: rgba(108, 99, 255, 0.3); box-shadow: 0 0 60px rgba(108, 99, 255, 0.15); }
+        }
+        .battery-indicator {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0,0,0,0.6);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(108, 99, 255, 0.2);
+            z-index: 2;
+            font-size: 10px;
+            color: #8a8aaa;
+        }
+        .battery-indicator .battery-level {
+            color: #2ECC71;
+        }
+        .world-clock-toggle {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            z-index: 2;
+            font-size: 16px;
+            color: #6a6a8a;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(0,0,0,0.4);
+            padding: 6px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(108, 99, 255, 0.2);
+        }
+        .world-clock-toggle:hover {
+            color: #6C63FF;
+            border-color: #6C63FF;
+        }
+        .info-panel {
+            background: rgba(26, 26, 46, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px 30px;
+            border: 1px solid rgba(108, 99, 255, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px 30px;
+            min-width: 320px;
+            max-width: 450px;
+            animation: fadeIn 0.6s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .info-item .label {
+            font-size: 10px;
+            color: #6a6a8a;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 400;
+        }
+        .info-item .value {
+            font-size: 16px;
+            color: #ddddee;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 20px rgba(108, 99, 255, 0.2);
+        }
+        .info-item .value.location {
+            font-size: 13px;
+            color: #8a8aaa;
+            font-weight: 400;
+        }
+        .status {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding-top: 10px;
+            border-top: 1px solid rgba(108, 99, 255, 0.1);
+            font-size: 12px;
+            color: #6a6a8a;
+            letter-spacing: 1px;
+        }
+        .status .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        .status .dot.active {
+            background: #2ECC71;
+            box-shadow: 0 0 20px rgba(46, 204, 113, 0.4);
+        }
+        .status .dot.searching {
+            background: #F39C12;
+            box-shadow: 0 0 20px rgba(243, 156, 18, 0.4);
+            animation: pulse 1s ease-in-out infinite;
+        }
+        .status .dot.error {
+            background: #FF6B6B;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.4);
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #6C63FF, #5a52d5);
+            color: white;
+            box-shadow: 0 4px 20px rgba(108, 99, 255, 0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(108, 99, 255, 0.4);
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.05);
+            color: #aaaacc;
+            border: 1px solid rgba(108, 99, 255, 0.2);
+        }
+        .btn-secondary:hover {
+            background: rgba(108, 99, 255, 0.1);
+            border-color: rgba(108, 99, 255, 0.4);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #2ECC71, #27ae60);
+            color: white;
+            box-shadow: 0 4px 20px rgba(46, 204, 113, 0.3);
+        }
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(46, 204, 113, 0.4);
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(12, 12, 29, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.8s ease;
+        }
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .loader {
+            width: 80px;
+            height: 80px;
+            border: 4px solid rgba(108, 99, 255, 0.1);
+            border-top-color: #6C63FF;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-text {
+            color: #aaaacc;
+            margin-top: 20px;
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+        .permission-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(12, 12, 29, 0.95);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 40px;
+            text-align: center;
+        }
+        .permission-overlay.visible {
+            display: flex;
+        }
+        .permission-overlay .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .permission-overlay h2 {
+            color: #ffffff;
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+        .permission-overlay p {
+            color: #8a8aaa;
+            font-size: 14px;
+            max-width: 400px;
+            line-height: 1.6;
+        }
+        .permission-overlay .btn {
+            margin-top: 20px;
+        }
+        @media (max-width: 500px) {
+            .watch { width: 300px; height: 300px; }
+            .hour-hand { height: 68px; width: 5px; }
+            .minute-hand { height: 98px; width: 3px; }
+            .second-hand { height: 98px; width: 2px; }
+            .marker.major { height: 20px; width: 2px; }
+            .marker { height: 12px; width: 1.5px; }
+            .number { font-size: 14px; }
+            .center-dot { width: 14px; height: 14px; }
+            .date-window { bottom: 22%; font-size: 10px; padding: 3px 10px; }
+            .info-panel { grid-template-columns: 1fr 1fr; gap: 10px 20px; padding: 15px 20px; min-width: auto; width: 100%; max-width: 320px; }
+            .info-item .value { font-size: 14px; }
+            .battery-indicator { top: 8px; right: 8px; font-size: 8px; padding: 2px 8px; }
+        }
+        @media (max-width: 350px) {
+            .watch { width: 250px; height: 250px; }
+            .hour-hand { height: 55px; width: 4px; }
+            .minute-hand { height: 80px; width: 3px; }
+            .second-hand { height: 80px; width: 1.5px; }
+            .number { font-size: 11px; }
+            .info-panel { padding: 12px 15px; gap: 8px 15px; }
+            .info-item .value { font-size: 12px; }
+            .btn { padding: 8px 16px; font-size: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loader"></div>
+        <p class="loading-text">DETECTING YOUR LOCATION...</p>
+    </div>
+
+    <div id="permissionOverlay" class="permission-overlay">
+        <div class="icon">📍</div>
+        <h2>Location Permission Required</h2>
+        <p>To automatically set your watch to the correct timezone, we need access to your location.</p>
+        <button class="btn btn-primary" onclick="retryLocation()">
+            <i class="fas fa-redo"></i> Try Again
+        </button>
+        <br>
+        <button class="btn btn-secondary" onclick="useManualTimezone()">
+            <i class="fas fa-clock"></i> Use Manual Timezone
+        </button>
+    </div>
+
+    <div class="watch-container">
+        <div class="watch" id="watch">
+            <div class="watch-face" id="watchFace">
+                <div id="markers"></div>
+                <div class="date-window" id="dateWindow">
+                    <span class="day" id="dayName">MON</span>
+                    <span id="dateNumber">15</span>
+                </div>
+                <div class="hand hour-hand" id="hourHand"></div>
+                <div class="hand minute-hand" id="minuteHand"></div>
+                <div class="second-hand" id="secondHand"></div>
+                <div class="center-dot"></div>
+                <div class="glass"></div>
+                <div class="glow-ring"></div>
+                <div class="battery-indicator">
+                    <span class="battery-icon">🔋</span>
+                    <span class="battery-level" id="batteryLevel">--%</span>
+                </div>
+                <div class="world-clock-toggle" id="worldClockToggle" title="Toggle World Clock Mode">
+                    🌍
+                </div>
+            </div>
+        </div>
+
+        <div class="info-panel" id="infoPanel">
+            <div class="info-item">
+                <span class="label">Time</span>
+                <span class="value" id="timeDisplay">--:--:--</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Timezone</span>
+                <span class="value" id="timezoneDisplay">--</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Location</span>
+                <span class="value location" id="locationDisplay">Detecting...</span>
+            </div>
+            <div class="info-item">
+                <span class="label">UTC Offset</span>
+                <span class="value" id="utcOffset">--</span>
+            </div>
+            <div class="status">
+                <span class="dot searching" id="statusDot"></span>
+                <span id="statusText">Initializing...</span>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-primary" id="refreshLocation">
+                <i class="fas fa-sync-alt"></i> Refresh Location
+            </button>
+            <button class="btn btn-secondary" id="toggle24Hour">
+                <i class="fas fa-clock"></i> 24H Format
+            </button>
+            <button class="btn btn-success" id="toggleTheme">
+                <i class="fas fa-moon"></i> Theme
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ===== CONFIGURATION =====
+        const TIMEZONEDB_API_KEY = 'D1KY98RBMN28';
+        let is24HourFormat = false;
+        let currentTimezone = 'UTC';
+        let watchInterval = null;
+        let isDarkTheme = true;
+        let isWorldClockMode = false;
+        let worldClockCities = ['London', 'Tokyo', 'New York', 'Sydney', 'Dubai', 'Paris', 'Singapore', 'Moscow'];
+        let worldClockIndex = 0;
+        let worldClockTimer = null;
+
+        // ===== DOM REFS =====
+        const hourHand = document.getElementById('hourHand');
+        const minuteHand = document.getElementById('minuteHand');
+        const secondHand = document.getElementById('secondHand');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const timezoneDisplay = document.getElementById('timezoneDisplay');
+        const locationDisplay = document.getElementById('locationDisplay');
+        const utcOffset = document.getElementById('utcOffset');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const permissionOverlay = document.getElementById('permissionOverlay');
+        const refreshBtn = document.getElementById('refreshLocation');
+        const toggleBtn = document.getElementById('toggle24Hour');
+        const themeBtn = document.getElementById('toggleTheme');
+        const markersContainer = document.getElementById('markers');
+        const dayName = document.getElementById('dayName');
+        const dateNumber = document.getElementById('dateNumber');
+        const batteryLevel = document.getElementById('batteryLevel');
+        const worldClockToggle = document.getElementById('worldClockToggle');
+        const body = document.body;
+
+        // ===== CREATE MARKERS =====
+        function createWatchMarkers() {
+            markersContainer.innerHTML = '';
+            for (let i = 0; i < 60; i++) {
+                const angle = i * 6;
+                const isMajor = i % 5 === 0;
+                const marker = document.createElement('div');
+                marker.className = `marker ${isMajor ? 'major' : ''}`;
+                marker.style.transform = `translate(-50%, -100%) rotate(${angle}deg)`;
+                if (isMajor) {
+                    const number = document.createElement('div');
+                    number.className = 'number';
+                    const num = i === 0 ? 12 : i / 5;
+                    number.textContent = num;
+                    const radius = 72;
+                    const radAngle = (angle - 90) * Math.PI / 180;
+                    const x = 50 + radius * Math.cos(radAngle);
+                    const y = 50 + radius * Math.sin(radAngle);
+                    number.style.left = `${x}%`;
+                    number.style.top = `${y}%`;
+                    number.style.transform = 'translate(-50%, -50%)';
+                    number.style.fontSize = window.innerWidth < 500 ? '14px' : '18px';
+                    markersContainer.appendChild(number);
+                }
+                markersContainer.appendChild(marker);
+            }
+        }
+
+        // ===== UPDATE WATCH =====
+        function updateWatch(now) {
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+            const milliseconds = now.getMilliseconds();
+
+            const secondDeg = ((seconds + milliseconds / 1000) / 60) * 360;
+            const minuteDeg = ((minutes + seconds / 60) / 60) * 360;
+            const hourDeg = ((hours % 12 + minutes / 60) / 12) * 360;
+
+            secondHand.style.transform = `translate(-50%, -100%) rotate(${secondDeg}deg)`;
+            minuteHand.style.transform = `translate(-50%, -100%) rotate(${minuteDeg}deg)`;
+            hourHand.style.transform = `translate(-50%, -100%) rotate(${hourDeg}deg)`;
+
+            let timeStr;
+            if (is24HourFormat) {
+                timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+            } else {
+                timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            }
+            timeDisplay.textContent = timeStr;
+
+            const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+            dayName.textContent = days[now.getDay()];
+            dateNumber.textContent = String(now.getDate()).padStart(2, '0');
+
+            const offset = -now.getTimezoneOffset();
+            const offsetHours = Math.floor(Math.abs(offset) / 60);
+            const offsetMinutes = Math.abs(offset) % 60;
+            const sign = offset >= 0 ? '+' : '-';
+            utcOffset.textContent = `UTC${sign}${String(offsetHours).padStart(2, '0')}:${String(offsetMinutes).padStart(2, '0')}`;
+        }
+
+        function getTimeInTimezone(timezone) {
+            try {
+                return new Date(new Date().toLocaleString('en-US', { timeZone: timezone }));
+            } catch (e) {
+                return new Date();
+            }
+        }
+
+        function startWatch(timezone) {
+            if (watchInterval) clearInterval(watchInterval);
+            currentTimezone = timezone;
+            timezoneDisplay.textContent = timezone;
+            watchInterval = setInterval(() => {
+                const now = getTimeInTimezone(timezone);
+                updateWatch(now);
+            }, 50);
+            updateBattery();
+        }
+
+        function updateBattery() {
+            if (navigator.getBattery) {
+                navigator.getBattery().then(battery => {
+                    const level = Math.round(battery.level * 100);
+                    batteryLevel.textContent = level + '%';
+                    batteryLevel.style.color = level > 50 ? '#2ECC71' : level > 20 ? '#F39C12' : '#FF6B6B';
+                }).catch(() => {
+                    batteryLevel.textContent = 'N/A';
+                });
+            } else {
+                batteryLevel.textContent = 'N/A';
+            }
+        }
+
+        function updateStatus(type, message) {
+            statusDot.className = `dot ${type}`;
+            statusText.textContent = message;
+        }
+
+        // ===== LOCATION =====
+        async function getTimezoneFromCoords(lat, lon) {
+            try {
+                const url = `https://api.timezonedb.com/v2.1/get-time-zone?key=${TIMEZONEDB_API_KEY}&format=json&by=position&lat=${lat}&lng=${lon}`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('TimezoneDB API error');
+                const data = await response.json();
+                if (data.status === 'OK') {
+                    return data.zoneName;
+                } else {
+                    throw new Error(data.message || 'Timezone not found');
+                }
+            } catch (error) {
+                console.warn('TimezoneDB failed, using fallback:', error.message);
+                return Intl.DateTimeFormat().resolvedOptions().timeZone;
+            }
+        }
+
+        function detectLocation() {
+            updateStatus('searching', 'Detecting location...');
+            locationDisplay.textContent = 'Detecting...';
+            permissionOverlay.classList.remove('visible');
+
+            if (!navigator.geolocation) {
+                updateStatus('error', 'Geolocation not supported');
+                locationDisplay.textContent = 'Not supported';
+                useManualTimezone();
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const { latitude, longitude } = position.coords;
+                    try {
+                        const geoResponse = await fetch(
+                            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+                        );
+                        const geoData = await geoResponse.json();
+                        const city = geoData.city || geoData.locality || geoData.principalSubdivision || 'Unknown';
+                        locationDisplay.textContent = city;
+                    } catch (e) {
+                        locationDisplay.textContent = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+                    }
+
+                    try {
+                        const timezone = await getTimezoneFromCoords(latitude, longitude);
+                        currentTimezone = timezone;
+                        timezoneDisplay.textContent = timezone;
+                        startWatch(timezone);
+                        updateStatus('active', `Location detected (${timezone})`);
+                    } catch (error) {
+                        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                        currentTimezone = tz;
+                        timezoneDisplay.textContent = tz + ' (fallback)';
+                        startWatch(tz);
+                        updateStatus('active', `Using browser timezone: ${tz}`);
+                    }
+                    loadingOverlay.classList.add('hidden');
+                },
+                (error) => {
+                    console.error('Geolocation error:', error);
+                    if (error.code === 1) {
+                        permissionOverlay.classList.add('visible');
+                        updateStatus('error', 'Location permission denied');
+                    } else if (error.code === 2) {
+                        locationDisplay.textContent = 'Position unavailable';
+                        updateStatus('error', 'Position unavailable');
+                        useManualTimezone();
+                    } else if (error.code === 3) {
+                        locationDisplay.textContent = 'Timeout';
+                        updateStatus('error', 'Location timeout');
+                        useManualTimezone();
+                    }
+                    loadingOverlay.classList.add('hidden');
+                },
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+            );
+        }
+
+        function retryLocation() {
+            permissionOverlay.classList.remove('visible');
+            loadingOverlay.classList.remove('hidden');
+            setTimeout(() => detectLocation(), 500);
+        }
+
+        function useManualTimezone() {
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            currentTimezone = tz;
+            timezoneDisplay.textContent = tz + ' (manual)';
+            locationDisplay.textContent = 'Manual mode';
+            startWatch(tz);
+            updateStatus('active', `Manual mode: ${tz}`);
+            loadingOverlay.classList.add('hidden');
+            permissionOverlay.classList.remove('visible');
+        }
+
+        // ===== WORLD CLOCK =====
+        function toggleWorldClock() {
+            isWorldClockMode = !isWorldClockMode;
+            if (isWorldClockMode) {
+                worldClockToggle.style.color = '#6C63FF';
+                worldClockToggle.title = 'Switch to Local Time';
+                worldClockIndex = 0;
+                showWorldClock();
+            } else {
+                worldClockToggle.style.color = '#6a6a8a';
+                worldClockToggle.title = 'Toggle World Clock Mode';
+                if (worldClockTimer) clearTimeout(worldClockTimer);
+                const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                startWatch(tz);
+                timezoneDisplay.textContent = tz;
+                locationDisplay.textContent = 'Local Time';
+                updateStatus('active', 'Back to local time');
+            }
+        }
+
+        function showWorldClock() {
+            if (!isWorldClockMode) return;
+            const city = worldClockCities[worldClockIndex % worldClockCities.length];
+            worldClockIndex++;
+            const timezoneMap = {
+                'London': 'Europe/London', 'Tokyo': 'Asia/Tokyo', 'New York': 'America/New_York',
+                'Sydney': 'Australia/Sydney', 'Dubai': 'Asia/Dubai', 'Paris': 'Europe/Paris',
+                'Singapore': 'Asia/Singapore', 'Moscow': 'Europe/Moscow'
+            };
+            const tz = timezoneMap[city] || 'UTC';
+            timezoneDisplay.textContent = `🌍 ${city}`;
+            locationDisplay.textContent = 'World Clock Mode';
+            startWatch(tz);
+            updateStatus('active', `🌍 World Clock: ${city}`);
+            if (worldClockTimer) clearTimeout(worldClockTimer);
+            worldClockTimer = setTimeout(() => {
+                if (isWorldClockMode) showWorldClock();
+            }, 4000);
+        }
+
+        // ===== THEME =====
+        function toggleTheme() {
+            isDarkTheme = !isDarkTheme;
+            if (!isDarkTheme) {
+                body.style.background = 'linear-gradient(135deg, #e8e8e8 0%, #d0d0d0 50%, #b8b8b8 100%)';
+                document.querySelector('.watch').style.background = 'radial-gradient(ellipse at center, #f0f0f0 0%, #d0d0d0 60%, #b0b0b0 100%)';
+                document.querySelector('.watch-face').style.background = 'radial-gradient(ellipse at center, #f5f5f5 0%, #e0e0e0 100%)';
+                document.querySelectorAll('.number').forEach(el => el.style.color = '#333');
+                document.querySelectorAll('.marker').forEach(el => el.style.background = '#666');
+                document.querySelectorAll('.marker.major').forEach(el => el.style.background = '#444');
+                document.getElementById('infoPanel').style.background = 'rgba(240, 240, 240, 0.9)';
+                document.querySelectorAll('.info-item .value').forEach(el => el.style.color = '#222');
+                document.querySelectorAll('.info-item .label').forEach(el => el.style.color = '#666');
+                document.querySelector('.status').style.color = '#666';
+                document.querySelector('.date-window').style.background = 'rgba(255,255,255,0.8)';
+                document.querySelector('.date-window').style.color = '#222';
+                document.querySelector('.date-window .day').style.color = '#666';
+                document.querySelector('.battery-indicator').style.background = 'rgba(255,255,255,0.8)';
+                document.querySelector('.battery-indicator').style.color = '#666';
+                themeBtn.innerHTML = '<i class="fas fa-sun"></i> Dark';
+            } else {
+                body.style.background = 'linear-gradient(135deg, #0c0c1d 0%, #1a1a3e 50%, #0c0c1d 100%)';
+                document.querySelector('.watch').style.background = 'radial-gradient(ellipse at center, #2a2a4a 0%, #1a1a2e 60%, #0a0a15 100%)';
+                document.querySelector('.watch-face').style.background = 'radial-gradient(ellipse at center, #2a2a4a 0%, #1a1a2e 100%)';
+                document.querySelectorAll('.number').forEach(el => el.style.color = '#aaaacc');
+                document.querySelectorAll('.marker').forEach(el => el.style.background = '#8a8aaa');
+                document.querySelectorAll('.marker.major').forEach(el => el.style.background = '#aaaacc');
+                document.getElementById('infoPanel').style.background = 'rgba(26, 26, 46, 0.9)';
+                document.querySelectorAll('.info-item .value').forEach(el => el.style.color = '#ddddee');
+                document.querySelectorAll('.info-item .label').forEach(el => el.style.color = '#6a6a8a');
+                document.querySelector('.status').style.color = '#6a6a8a';
+                document.querySelector('.date-window').style.background = 'rgba(0,0,0,0.6)';
+                document.querySelector('.date-window').style.color = '#ffffff';
+                document.querySelector('.date-window .day').style.color = '#6a6a8a';
+                document.querySelector('.battery-indicator').style.background = 'rgba(0,0,0,0.6)';
+                document.querySelector('.battery-indicator').style.color = '#8a8aaa';
+                themeBtn.innerHTML = '<i class="fas fa-moon"></i> Theme';
+            }
+        }
+
+        // ===== EVENTS =====
+        function refreshLocation() {
+            loadingOverlay.classList.remove('hidden');
+            isWorldClockMode = false;
+            worldClockToggle.style.color = '#6a6a8a';
+            if (worldClockTimer) clearTimeout(worldClockTimer);
+            detectLocation();
+        }
+
+        function toggleFormat() {
+            is24HourFormat = !is24HourFormat;
+            toggleBtn.innerHTML = is24HourFormat ? '<i class="fas fa-clock"></i> 12H Format' : '<i class="fas fa-clock"></i> 24H Format';
+        }
+
+        // ===== INIT =====
+        function init() {
+            createWatchMarkers();
+            const defaultTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            startWatch(defaultTz);
+            updateBattery();
+            setTimeout(() => detectLocation(), 500);
+            refreshBtn.addEventListener('click', refreshLocation);
+            toggleBtn.addEventListener('click', toggleFormat);
+            themeBtn.addEventListener('click', toggleTheme);
+            worldClockToggle.addEventListener('click', toggleWorldClock);
+        }
+
+        window.addEventListener('resize', () => createWatchMarkers());
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
